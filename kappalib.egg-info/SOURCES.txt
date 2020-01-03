@@ -1,0 +1,9 @@
+LICENSE
+MANIFEST.in
+README.md
+setup.py
+kappalib.egg-info/PKG-INFO
+kappalib.egg-info/SOURCES.txt
+kappalib.egg-info/dependency_links.txt
+kappalib.egg-info/requires.txt
+kappalib.egg-info/top_level.txt
