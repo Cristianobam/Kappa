@@ -1,10 +1,12 @@
 LICENSE
 MANIFEST.in
-README.md
+README.rst
 setup.py
 kappalib/__init__.py
+kappalib/_summary.py
 kappalib/_version.py
-kappalib/kappa.py
+kappalib/plot.py
+kappalib/stats.py
 kappalib.egg-info/PKG-INFO
 kappalib.egg-info/SOURCES.txt
 kappalib.egg-info/dependency_links.txt
