@@ -3,11 +3,11 @@ Stats
 ##############
 
 -> Exploration 
-    -> Descriptive
+    -> Descriptive (Okay)
 -> T-test
-    -> Independent
-    -> Paired
-    -> One Sample
+    -> Independent (Okay)
+    -> Paired (Okay)
+    -> One Sample (Okay)
 -> Anova
     -> One-Way
     -> Anova
@@ -22,7 +22,7 @@ Stats
 Plots
 ##############
 
--> Sacatter
+-> Sacatter (Okay)
 -> Regression
 -> Error Bar
 -> 
@@ -32,4 +32,4 @@ Plots
 Print
 ##############
 
--> Table Visualization
+-> Table Visualization (Okay)

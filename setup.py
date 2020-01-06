@@ -26,6 +26,7 @@ setuptools.setup(
     install_requires=[
         "numpy>=1.17.3",
         "matplotlib>=3.1.1",
+        "tabulate>=0.8.6"
     ],
     include_package_data=True,
 )
