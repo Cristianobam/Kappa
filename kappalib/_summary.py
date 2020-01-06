@@ -3,15 +3,15 @@ from tabulate import tabulate
 class Summary:
     def __init__(self, results):
         self.test = results['test'] 
-        self.pvalue = results['pvalue']
-        self.statistic = results['statistic']
-        self.df = results['df']
-        self.xmean = results['xmean']
-        self.ymean = results['ymean']
-        self._genTable()
+        self._genTable(results)
 
-    def _genTable(self):
+    def _genTable(self, results):
         if self.test == 'tstats':
+            self.pvalue = results['pvalue']
+            self.statistic = results['statistic']
+            self.df = results['df']
+            self.xmean = results['xmean']
+            self.ymean = results['ymean']
             self._header = ['','statistic','df','p']
             self._table = [['Student\'s t', self.statistic, self.df, self.pvalue]]
             self._summary = tabulate(self._table, self._header, tablefmt="simple")  
