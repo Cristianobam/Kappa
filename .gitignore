@@ -1,3 +1,4 @@
 demo.py
 kappalib/__pycache__/
 .DS_Store
+.vscode/
