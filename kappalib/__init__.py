@@ -5,7 +5,8 @@ It may be imported directly, e.g.::
 
 Kappalib is currently developed by Azarias, Cristiano (2020-now)
 """
-
-import kappalib.plot
-import kappalib.stats
+from . import plot
+from . import stats
 from kappalib._version import __version__
+
+__all__ = ['__version__']
