@@ -85,3 +85,44 @@ class Summary:
         
         else:
             raise Exception(r'Error. {} not in [simple, latex, html].'.format(format))
+
+class TTest():
+    __slots__ = ['_stats','_param','_pvalue','_CI','_estimate',
+                 '_NANs','_stderr','_alternative','_method','_ES']
+
+    def __init__(self,**kwargs):
+        for key, value in kwargs.items():
+            self.__setattr__('_' + key, value)
+  
+    def stats(self):
+      return self._stats
+    
+    def param(self):
+      return self._param
+  
+    def pvalue(self):
+      return self._pvalue
+    
+    def CI(self):
+      return self._CI
+    
+    def estimate(self):
+      return self._estimate
+    
+    def nans(self):
+      return self._NANs
+    
+    def stderr(self):
+      return self._stderr
+    
+    def alternative(self):
+      return self._alternative
+
+    def method(self):
+      return self._method
+     
+    def ES(self):
+      return self._ES
+
+    def __getattr__(self, attr):
+        raise ValueError(f'Oops, I Caught An Error! {attr[1:].upper()} was not defined')

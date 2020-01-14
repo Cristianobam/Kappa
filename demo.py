@@ -27,4 +27,3 @@ denom = np.sqrt(sp*(1/n1+1/n2)) # Standart Error
 
 with np.errstate(divide='ignore', invalid='ignore'):
     statistic = np.divide(df, denom) # Statistic
-

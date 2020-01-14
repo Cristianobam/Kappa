@@ -2,34 +2,51 @@
 Stats
 ##############
 
--> Exploration 
-    -> Descriptive (Okay)
--> T-test
-    -> Independent (Okay)
-    -> Paired (Okay)
-    -> One Sample (Okay)
--> Anova
-    -> One-Way
-    -> Anova
-    -> Repeated-Measures
--> Regressions
-    -> Correlation
-    -> Linear Regression
--> Power Analysis
+* Exploration
+    * Descriptives
+
+* T-Tests
+    * Independent Samples T-Test
+    * Paired Samples T-Test
+    * One Sample T-Test
+    * Effect Size
+        * Cohen's
+
+* ANOVA
+    * One-Way ANOVA
+    * ANOVA
+    * Repeated Measures ANOVA
+    * ANCOVA
+    * Post-Hoc
+        * Bonferroni
+        * Holm
+        * Tukey
+    * Effect Size
+        * Cohen's
+        * Omega
+
+* Regression
+    * Correlation Matrix
+    * Linear Regression
+    
+* Frequencies
+    * Proportion Test (2 Outcomes)
+    * Proportion Test (N Outcomes)
+    * Contingency Tables
+    * Paired Samples Contingency Tables
 
 
 ##############
 Plots
 ##############
 
--> Sacatter (Okay)
--> Regression
--> Error Bar
--> 
+* Sacatter (Okay)
+* Regression
+* Error Bar
 
 
 ##############
 Print
 ##############
 
--> Table Visualization (Okay)
+* Table Visualization
