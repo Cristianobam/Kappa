@@ -6,7 +6,7 @@ setuptools.setup(
     name="kappalib", # Replace with your own username
     version=__version__,#pylint: disable=E0602
     author="Cristiano Moraes Bilacchi Azarias",
-    author_email="cristiano.bilacchi@aluno.ufabc.edu.br",
+    author_email="28158496+Cristianobam@users.noreply.github.com",
     description="Python plotting and statistical package",
     long_description='''
     Kappa is a Python 3 plotting and statistical library which performs both graphics
