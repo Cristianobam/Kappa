@@ -1,128 +1,105 @@
 from tabulate import tabulate
 
-class Summary:
-    def __init__(self, results):
-        self.test = results['test'] 
-        self._genTable(results)
+#class ANOVA():
+#class Correl():
+#class 
 
-    def _genTable(self, results):
-        if self.test == 'tstats':
-            self.pvalue = results['pvalue']
-            self.statistic = results['statistic']
-            self.df = results['df']
-            self.xmean = results['xmean']
-            self.ymean = results['ymean']
-            self._header = ['','statistic','df','p']
-            self._table = [['Student\'s t', self.statistic, self.df, self.pvalue]]
-            self._summary = tabulate(self._table, self._header, tablefmt="simple")  
-        else:
-            pass
-        
-    def convert(self, format='latex'):
-        """
-        Convert the summary table into others formats.
-        
+class TTest():  
+  __slots__ = ['_x', '_y', '_ttest', '_stats', '_v', '_pvalue',
+                '_mean_difference', '_CI_l', '_CI_u', '_CohensD', 
+                '_method', '_tail','_header','_body','_mu', 
+                '_alternative']
 
-        Parameters
-        ----------
-        format : {'latex', 'html'}
-
-        Returns
-        -------
-        Table string on the required format
-
-        """
-        if format == 'latex':
-            return tabulate(self._table, self._header, tablefmt='latex')
-        
-        elif format == 'html':
-            return '<table border="1" class="dataframe">' + tabulate(self._table, self._header, tablefmt='html')[7:]
-        
-        else:
-            raise Exception(r'Error. {} not in [latex, html].'.format(format))
-
-    def summary(self):
-        """
-        Prints the statistic summary table
-
-
-        Returns
-        -------
-        Summary table
-        """
-        print(self._summary+'\n')
-        print(tabulate([[self.xmean,self.ymean]], ['X Mean', 'Y Mean'], tablefmt="simple"))
-
-    def export(self, name, format='latex'):
-        """
-        Export the summary table into others formats.
-        
-
-        Parameters
-        ----------
-        format : {'simple','latex', 'html'}
-
-        Returns
-        -------
-        Exports the table string on the required format
-
-        """
-
-        if format == 'latex':
-            with open(f'{name}.tex', 'w') as f:
-                for i in tabulate(self._table, self._header, tablefmt='latex'):
-                    f.write(i)
-        
-        elif format == 'simple':
-            with open(f'{name}.txt', 'w') as f:
-                for i in tabulate(self._table, self._header, tablefmt='simple'):
-                    f.write(i)
-        
-        elif format == 'html':
-            with open(f'{name}.html', 'w') as f:
-                for i in tabulate(self._table, self._header, tablefmt='html'):
-                    f.write(i)
-        
-        else:
-            raise Exception(r'Error. {} not in [simple, latex, html].'.format(format))
-
-class TTest():
-    __slots__ = ['_stats','_param','_pvalue','_CI','_estimate',
-                 '_NANs','_stderr','_alternative','_method','_ES']
-
-    def __init__(self,**kwargs):
-        for key, value in kwargs.items():
-            self.__setattr__('_' + key, value)
-  
-    def stats(self):
+  def __init__(self,result, effect_size, mean_difference, confidence_interval):
+      results = result.copy()
+      for key, value in results.items():
+          self.__setattr__('_' + key, value)
+      del results['mu']
+      del results['alternative']
+      del results['tail']
+      del results['method']
+      self._set_table(results, effect_size, mean_difference, confidence_interval)
+      
+  def stats(self):
       return self._stats
-    
-    def param(self):
-      return self._param
-  
-    def pvalue(self):
+
+  def d(self):
+      return self._CohensD
+
+  def p_value(self):
       return self._pvalue
-    
-    def CI(self):
-      return self._CI
-    
-    def estimate(self):
-      return self._estimate
-    
-    def nans(self):
-      return self._NANs
-    
-    def stderr(self):
-      return self._stderr
-    
-    def alternative(self):
-      return self._alternative
 
-    def method(self):
-      return self._method
-     
-    def ES(self):
-      return self._ES
+  def mean_difference(self):
+      return self._mean_difference
 
-    def __getattr__(self, attr):
-        raise ValueError(f'Oops, I Caught An Error! {attr[1:].upper()} was not defined')
+  def degrees_fredom(self):
+      return self._v
+
+  def confidence_interval(self):
+      return (self._CI_l, self._CI_u)
+
+  def __getattr__(self, attr):
+      raise ValueError(f'Oops, I Caught An Error! {attr.upper()} was not defined.')
+
+  def _set_table(self,results, effect_size, mean_difference, confidence_interval):
+      if not effect_size:
+          del results['CohensD']
+      if not mean_difference:
+          del results['mean_difference']
+      if not confidence_interval:
+          del results['CI_l']
+          del results['CI_u']
+      if 'paired' not in self._method.lower():
+          del results['y']
+      
+      header_keys = {'x':'','y':'','ttest':'','stats':'statistic','v':'df',
+                    'pvalue':'p','mean_difference':'Mean Difference',
+                      'CohensD':'Cohen\'s d', 'CI_l':'Lower', 'CI_u':'Upper'}
+      
+
+      self._header = [header_keys[i] for i in results.keys()]
+      
+      self._body = list(results.values())
+      index = list(results).index('pvalue')
+      self._body[index] = '<0.001' if self._body[index] < 0.001 else self._body[index]
+      
+  def summary(self):
+      print(self._method)
+      print(tabulate([self._body], self._header, tablefmt="psql", floatfmt=".3f", stralign='center'))
+      if self._mu is not None and self._mu != 0:
+          print('Note. ' + chr(956)+ '=' + str(self._mu))
+      if self._alternative == 'less':
+          print('Note. H0: Group 1 < Group 2')
+      elif self._alternative == 'bigger': 
+          print('Note. H0: Group 1 > Group 2')
+    
+  def summary_convert(self, format='latex'):
+      """
+      Convert the summary table into others formats.
+      
+
+      Parameters
+      ----------
+      format : {'latex', 'html'}
+
+      Returns
+      -------
+      Table string on the required format
+
+      """
+      if format == 'latex':
+          print(self._method)
+          print(tabulate([self._body], self._header, tablefmt="latex", floatfmt=".3f", stralign='center'))
+          
+          if self._mu is not None and self._mu != 0:
+            print('Note.' + r'$\mu = $' + str(self._mu))
+          if self._alternative == 'less':
+            print(r'Note. $H_0$: Group 1 < Group 2')
+          elif self._alternative == 'bigger': 
+            print(r'Note. $H_0$: Group 1 > Group 2')
+      
+      elif format == 'html':
+          print('<table border="1" class="dataframe">' + tabulate([self._body], self._header, tablefmt="html", floatfmt=".3f", stralign='center'))
+      
+      else:
+          raise Exception(r'Error. {} not in [latex, html].'.format(format))

@@ -1,5 +1,8 @@
+demo.ipynb
 demo.py
 **/__pycache__/
 .DS_Store
 .vscode/
+.ipynb_checkpoints/
+.Rhistory
 random.csv

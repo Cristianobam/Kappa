@@ -27,3 +27,18 @@ denom = np.sqrt(sp*(1/n1+1/n2)) # Standart Error
 
 with np.errstate(divide='ignore', invalid='ignore'):
     statistic = np.divide(df, denom) # Statistic
+
+
+
+
+# Two Sample t-test
+
+# data:  x and y
+# t = -28.779, df = 198, p-value < 2.2e-16
+# alternative hypothesis: true difference in means is not equal to 0
+# 95 percent confidence interval:
+#  -4.274093 -3.725907
+# sample estimates:
+# mean of x mean of y 
+# 0.1908471 4.1908471 
+
