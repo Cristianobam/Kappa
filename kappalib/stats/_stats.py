@@ -1,5 +1,5 @@
 import numpy as np
-from ._summary import TTest
+from ._summary import *
 from scipy.stats import t, f, chi, norm
 
 __all__ = ['pooledVar', 'ttest', 'descriptives','correlation']
