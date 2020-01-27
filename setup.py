@@ -3,7 +3,7 @@ import setuptools
 exec(open('kappalib/_version.py').read())
 
 setuptools.setup(
-    name="kappalib", # Replace with your own username
+    name="kappalib",
     version=__version__,#pylint: disable=E0602
     author="Cristiano Moraes Bilacchi Azarias",
     author_email="28158496+Cristianobam@users.noreply.github.com",
@@ -13,7 +13,7 @@ setuptools.setup(
     and Frequentists analyses. Kappa aims to create better-looking graphics using Matplotlib
     and brings the Jamovi/Jasp analyses to python.''',
     url="https://github.com/Cristianobam/kappalib",
-    packages=['kappalib'],
+    packages=['kappalib', 'kappalib.stats', 'kappalib.plot'],
     classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: MIT License",

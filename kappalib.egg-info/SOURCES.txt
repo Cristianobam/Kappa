@@ -3,12 +3,14 @@ MANIFEST.in
 README.rst
 setup.py
 kappalib/__init__.py
-kappalib/_summary.py
 kappalib/_version.py
-kappalib/plot.py
-kappalib/stats.py
 kappalib.egg-info/PKG-INFO
 kappalib.egg-info/SOURCES.txt
 kappalib.egg-info/dependency_links.txt
 kappalib.egg-info/requires.txt
 kappalib.egg-info/top_level.txt
+kappalib/plot/__init__.py
+kappalib/plot/_plot.py
+kappalib/stats/__init__.py
+kappalib/stats/_stats.py
+kappalib/stats/_summary.py
