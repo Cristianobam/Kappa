@@ -182,6 +182,7 @@ def correlation(x=None, y=None, alternative='two-sided', data=None, alpha=0.05, 
     names = ['x', 'y']
 
     if data is not None:
+        df = dict(data)
         n = len(list(dict(data).values())[0])
         keys = list(dict(data).keys())
         r = list()
@@ -192,10 +193,8 @@ def correlation(x=None, y=None, alternative='two-sided', data=None, alpha=0.05, 
                 r.append(num/denom)
     
         r = np.reshape(r, (data.shape[1],data.shape[1]))
-
-        names = keys
-
     else:
+        df = {'x':x,'y':y}
         n = len(x)
         r = list()
         for i in [x,y]:
@@ -213,16 +212,19 @@ def correlation(x=None, y=None, alternative='two-sided', data=None, alpha=0.05, 
     p = _ttest_distribution(alternative, statistic, v)
     
     fishersz, sigmaz = _fisher_transformation(r,n)
+
+    with np.errstate(divide='ignore', invalid='ignore'):
+        CIu = _z_critic(alpha/2)*sigmaz + fishersz if alternative == 'two-sided' else -np.inf + fishersz if alternative == 'less' else - _z_critic(alpha)*sigmaz + fishersz
+        CIl = - _z_critic(alpha/2)*sigmaz + fishersz if alternative == 'two-sided' else _z_critic(alpha)*sigmaz + fishersz if alternative == 'less' else np.inf + fishersz
     
-    CIu = _z_critic(alpha/2)*sigmaz + fishersz if alternative == 'two-sided' else -np.inf + fishersz if alternative == 'less' else - _z_critic(alpha)*sigmaz + fishersz
-    CIl = - _z_critic(alpha/2)*sigmaz + fishersz if alternative == 'two-sided' else _z_critic(alpha)*sigmaz + fishersz if alternative == 'less' else np.inf + fishersz
     CIu = np.tanh(CIu)
     CIl = np.tanh(CIl)
 
-    results = {'names':names, 'r':r, 'stats':statistic, 'alpha':alpha,
-               'v':v, 'pvalue':p, 'alternative':alternative, 'CI_l':CIu, 'CI_u':CIl}
+    results = {'r':r, 'stats':statistic, 'alpha':alpha,
+               'v':v, 'pvalue':p, 'alternative':alternative, 'CI_l':CIu, 'CI_u':CIl,
+               'data':df}
 
-    return results
+    return Correlation(results, confidence_interval)
 
 def _fisher_transformation(r,n):
     with np.errstate(divide='ignore', invalid='ignore'):
