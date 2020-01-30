@@ -1,6 +1,6 @@
 import numpy as np
-from ._summary import TTest
-from scipy.stats import t, f, chi
+from ._summary import *
+from scipy.stats import t, f, chi, norm
 
 __all__ = ['pooledVar', 'ttest', 'descriptives','correlation']
 
@@ -151,13 +151,12 @@ def ttest(x=None, y=None, alternative='two-sided', mu=0, data=None, paired=False
         statistic = np.divide(df, denom)  # Statistic
     
     p = _ttest_distribution(alternative, statistic, v)
-    CI = __ttest_critic(alpha/2, v)*denom * np.array([-1,1]) + df if alternative == 'two-sided' else __ttest_critic(alpha, v)*denom * np.array([-np.inf,1]) + df if alternative == 'less' else __ttest_critic(alpha, v)*denom * np.array([-1,np.inf]) + df
+    CI = _ttest_critic(alpha/2, v)*denom * np.array([-1,1]) + df if alternative == 'two-sided' else _ttest_critic(alpha, v)*denom * np.array([-np.inf,1]) + df if alternative == 'less' else _ttest_critic(alpha, v)*denom * np.array([-1,np.inf]) + df
     cohensD =  statistic/np.sqrt(n) if y is None or 'Paired' in method else statistic*np.sqrt(1/n1+1/n2)
 
-    results = {'x': xname, 'y': yname, 'ttest':ttest, 'stats':statistic,
+    results = {'x': xname, 'y': yname, 'ttest':ttest, 'stats':statistic,'alpha':alpha,
                'v':v, 'pvalue':p, 'mean_difference':df, 'CI_l':CI[0], 'CI_u':CI[-1],
-               'CohensD':cohensD, 'tail':alternative, 'method':method, 'mu':mu, 
-               'alternative':alternative}
+               'CohensD':cohensD, 'method':method, 'mu':mu, 'alternative':alternative}
     
     return TTest(results, effect_size, mean_difference, confidence_interval)
 
@@ -179,10 +178,9 @@ def correlation(x=None, y=None, alternative='two-sided', data=None, alpha=0.05, 
     -------
     Correlation object
     """
-    xname = 'x'
-    yname = 'y'
 
     if data is not None:
+        df = dict(data)
         n = len(list(dict(data).values())[0])
         keys = list(dict(data).keys())
         r = list()
@@ -193,8 +191,8 @@ def correlation(x=None, y=None, alternative='two-sided', data=None, alpha=0.05, 
                 r.append(num/denom)
     
         r = np.reshape(r, (data.shape[1],data.shape[1]))
-
     else:
+        df = {'x':x,'y':y}
         n = len(x)
         r = list()
         for i in [x,y]:
@@ -208,13 +206,30 @@ def correlation(x=None, y=None, alternative='two-sided', data=None, alpha=0.05, 
     with np.errstate(divide='ignore', invalid='ignore'):
             statistic = np.sqrt(n-2)*(r/np.sqrt(1-r**2))
         
-    v = n - 2  
+    v = n - 2
     p = _ttest_distribution(alternative, statistic, v)
     
-    results = {'x': xname, 'y': yname, 'r':r, 'stats':statistic,
-               'v':v, 'pvalue':p, 'tail':alternative}
+    fishersz, sigmaz = _fisher_transformation(r,n)
 
-    return results
+    with np.errstate(divide='ignore', invalid='ignore'):
+        CIu = _z_critic(alpha/2)*sigmaz + fishersz if alternative == 'two-sided' else -np.inf + fishersz if alternative == 'less' else - _z_critic(alpha)*sigmaz + fishersz
+        CIl = - _z_critic(alpha/2)*sigmaz + fishersz if alternative == 'two-sided' else _z_critic(alpha)*sigmaz + fishersz if alternative == 'less' else np.inf + fishersz
+    
+    CIu = np.tanh(CIu)
+    CIl = np.tanh(CIl)
+
+    results = {'r':r, 'stats':statistic, 'alpha':alpha,
+               'v':v, 'pvalue':p, 'alternative':alternative, 'CI_l':CIu, 'CI_u':CIl,
+               'data':df}
+
+    return Correlation(results, confidence_interval)
+
+def _fisher_transformation(r,n):
+    with np.errstate(divide='ignore', invalid='ignore'):
+        fishersz = 0.5 * (np.log(1+r)-np.log(1-r))
+        sigmaz = 1/np.sqrt(n-3)
+    
+    return fishersz, sigmaz
 
 def ftest(x, y, alternative = "two.sided", alpha = 0.95):
     pass
@@ -233,11 +248,20 @@ def descriptives(x):
 
     print(_table)
 
-def __ttest_critic(alpha, v):
+def _z_critic(alpha):
+    return norm.ppf(1.0 - alpha)  # calculate the critical value
+
+def _z_distribution(alternative, statistic, v):
+    tails = {'two-sided': lambda statistic, v: (1.0 - norm.cdf(abs(statistic))) * 2.0,
+             'less': lambda statistic, v: (1.0 - norm.cdf(abs(statistic))),
+             'greater': lambda statistic, v: norm.cdf(abs(statistic))}
+    return tails[alternative](statistic, v)
+
+def _ttest_critic(alpha, v):
     return t.ppf(1.0 - alpha, v)  # calculate the critical value
 
 def _ttest_distribution(alternative, statistic, v):
     tails = {'two-sided': lambda statistic, v: (1.0 - t.cdf(abs(statistic), v)) * 2.0,
-             'less': lambda statistic, v: (1.0 - t.cdf(abs(statistic), v)),
-             'greater': lambda statistic, v: t.cdf(abs(statistic), v)}
+             'greater': lambda statistic, v: (1.0 - t.cdf(statistic, v)),
+             'less': lambda statistic, v: t.cdf(statistic, v)}
     return tails[alternative](statistic, v)

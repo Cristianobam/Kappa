@@ -1,52 +1,10 @@
 import numpy as np
-from ._summary import *
-from scipy.stats import t, f, chi, norm
+from ._summary import Correlation, TTest, Descriptive
+from ._statistics import pooledVar
+from scipy.stats import t, f, norm
 
 __all__ = ['pooledVar', 'ttest', 'descriptives','correlation']
 
-
-def moving_average(x,axis=0,type='simple',weight=1):
-    """
-    Moving Average for an Array.
-
-
-    Parameters
-    ----------
-    x: Array Vector
-        The arrays must have the same shape, except in the dimension.
-
-    Returns
-    -------
-    sp : float
-        The calculated pooled variance.
-    """
-
-    x = np.array(x)
-    n = np.shape(t)[axis]
-    weights = np.ones(n)/n 
-    for i in range(n):
-       np.convolve(x[i,:], n, mode='valid') 
-
-def pooledVar(x, y):
-    """
-    Pooled Variance of two samples.
-
-
-    Parameters
-    ----------
-    x, y : 1 dimensional array_like
-        The arrays must have the same shape, except in the dimension.
-
-    Returns
-    -------
-    sp : float
-        The calculated pooled variance.
-    """
-    n1 = np.size(x)
-    n2 = np.size(y)
-    s1 = np.var(x, ddof=1)
-    s2 = np.var(y, ddof=1)
-    return ((n1-1)*s1+(n2-1)*s2)/(n1+n2-2)
 
 def ttest(x=None, y=None, alternative='two-sided', mu=0, data=None, paired=False, var_equal=False, alpha=0.05, effect_size=False, mean_difference=False, confidence_interval=False):
     """
@@ -178,8 +136,6 @@ def correlation(x=None, y=None, alternative='two-sided', data=None, alpha=0.05, 
     -------
     Correlation object
     """
-    
-    names = ['x', 'y']
 
     if data is not None:
         df = dict(data)
@@ -245,10 +201,10 @@ def descriptives(x):
     minimum = np.min(x)
     maximum = np.max(x)
 
-    _table = [['N', n],['Missing',miss],['Mean',mean],['Median',median],
-              ['Variance', variance],['Minimum',minimum],['Maximum',maximum]]
-
-    print(_table)
+    results = {'n':n, 'missing':miss, 'mean':mean, 'median':median, 
+                'variance':variance, 'minimum':minimum, 'maximum':maximum}
+    
+    return Descriptive(results)
 
 def _z_critic(alpha):
     return norm.ppf(1.0 - alpha)  # calculate the critical value

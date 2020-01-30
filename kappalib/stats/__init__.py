@@ -1,1 +1,2 @@
-from ._stats import *
+from ._statistics import *
+from ._inference import *

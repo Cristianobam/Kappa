@@ -1,19 +1,51 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
-from scipy.stats import t
+from scipy.stats import t, norm
 
 plt.rcParams['figure.facecolor'] = 'white'
 plt.rcParams['axes.facecolor'] = 'whitesmoke'
 plt.rcParams['legend.facecolor'] = 'none'
 plt.rcParams['legend.edgecolor'] = 'none'
 
-__all__ = ['scatter', 'heatmap', 'linear_regression']
+__all__ = ['scatter', 'heatmap', 'linear_regression', 'qqplot']
 
-def scatter(x,y,jitter=.75,errBar='std',facecolor='none',edgecolor='firebrick',alpha=1,s=50,**kwargs):
-  np.random.seed(23)
-  X = x + np.random.randn(*np.shape(x))*jitter/10
-  plt.scatter(X,y,facecolor='none',edgecolor='firebrick',alpha=1,s=50,**kwargs)
+def scatter(x,y,jitter=.3,errBar='std',alpha=.05,axis=0,ax=None,
+            linewidth=1,linecolor='teal',**kwargs):
+    
+    if ax is None:
+      fig, ax = plt.subplots()
+    
+    Y = np.ravel(y)
+    X = np.ravel(x)
+    index = {i:np.where(X==i) for i in np.unique(X)}
+    y_mean = [Y[i].mean() for i in index.values()]
+        
+    if errBar == 'std':
+        yerr = np.array([Y[i].std(ddof=1) for i in index.values()])
+    elif errBar == 'se' or errBar == 'ci':
+        yerr = np.array([Y[i].std(ddof=1)/np.sqrt(len(Y[i])) for i in index.values()])
+        if errBar == 'ci':
+            n = [len(Y[i]) for i in index.values()]
+            yerr = [t.ppf(1-alpha/2,i-1)*yerr[l] for l,i in enumerate(n)]
+    else:
+        yerr = None
+
+    if 'facecolor' not in kwargs:
+        kwargs['facecolor'] = 'none'
+    if 'edgecolor' not in kwargs:
+        kwargs['edgecolor'] = 'firebrick'
+    if 'alpha' not in kwargs:
+        kwargs['alpha'] = 1
+    if 's' not in kwargs:
+        kwargs['s'] = 50
+
+    np.random.seed(23)
+    x_jitter = X + np.random.randn(len(X))*jitter/10
+    ax.scatter(x_jitter,Y,**kwargs)
+    ax.errorbar(index.keys(),y_mean,yerr=yerr,capsize=5,linewidth=linewidth,
+                color=linecolor)
+    ax.grid(linestyle='dashed',color='grey',alpha=.35)
 
 def heatmap(data, annot=False, fmt=2, linewidth=3, linecolor='white', 
             txtcolor=['white','black'], beta=.25, cbar=True, xticklabels='auto',
@@ -74,6 +106,33 @@ def heatmap(data, annot=False, fmt=2, linewidth=3, linecolor='white',
                     ax.text(i,j,num,horizontalalignment='center',
                             verticalalignment='center',
                             color=txtcolor[0] if abs(num)>=max_data*(1-beta) else txtcolor[-1])
+
+def qqplot(x, axis='equal', lineguide=True, linecolor='firebrick', linewidth=.8, **kwargs):
+    
+    if 'facecolor' not in kwargs:
+        kwargs['facecolor'] = 'none'
+    
+    if 'edgecolor' not in kwargs:
+        kwargs['edgecolor'] = 'teal'
+        
+    if 's' not in kwargs:
+        kwargs['s'] = 30
+        
+    sample = np.sort(x)
+    n = len(sample)+1
+    zscore = norm.ppf(np.arange(1/n,1+1/n,1/n))[:-1]
+    
+    plt.scatter(zscore,sample,**kwargs)
+    
+    if isinstance(lineguide, bool):
+        if lineguide==True:
+            plt.plot([min(zscore),max(zscore)],[min(zscore),max(zscore)],
+                     color=linecolor,linewidth=linewidth)
+    plt.axis(axis)
+    plt.grid(color='grey',alpha=.3,linestyle='dashed')
+    plt.xlabel('Theorical Quantile (Z-Score)')
+    plt.ylabel('Actual Quantile (Sample Data)')
+    plt.title('QQ-Plot')
 
 def linear_regression(x,y,data=None,interceptor=True,plot=False,confidence_interval=False,
                      ax=None,grid=True,linecolor='firebrick',facecolor=None,
