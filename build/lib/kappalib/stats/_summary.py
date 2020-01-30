@@ -1,9 +1,56 @@
 from tabulate import tabulate
 import numpy as np
 import matplotlib.pyplot as plt
-from kappalib.plot import *
+from kappalib.plot import heatmap,linear_regression
 
 #class ANOVA():
+
+class Descriptive():
+    __slots__ = ['_n', '_missing', '_mean', '_median', '_variance', 
+                '_minimum', '_maximum', '_header', '_body']
+
+    def __init__(self,result):
+        for key, value in result.items():
+            self.__setattr__('_' + key, value)
+        self._set_table()
+        
+    def __getattr__(self, attr):
+        raise ValueError(f'Oops, I Caught An Error! {attr.upper()} was not defined.')
+    
+    def n(self):
+        return self._n
+        
+    def missing(self):    
+        return self._missing
+        
+    def mean(self):    
+        return self._mean
+        
+    def median(self):    
+        return self._median
+        
+    def variance(self):    
+        return self._variance
+        
+    def minimum(self):    
+        return self._minimum
+        
+    def maximum(self):    
+        return self._maximum
+
+    def _set_table(self):
+        self._header = ['', 'x']
+        self._body = [['Number', self._n],
+                      ['Missing', self._missing],
+                      ['Mean', self._mean],
+                      ['Median', self._median],
+                      ['Variance', self._variance],
+                      ['Minimum', self._minimum],
+                      ['Maximum', self._maximum]]
+
+    def summary(self):
+        print('Descriptive')
+        print(tabulate(self._body, self._header, tablefmt="psql", floatfmt=".3f", stralign='center'))
 
 class Correlation(): 
     __slots__ = ['_names', '_r', '_stats', '_v', '_pvalue', '_header',

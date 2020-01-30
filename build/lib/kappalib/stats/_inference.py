@@ -195,9 +195,9 @@ def ftest(x, y, alternative = "two.sided", alpha = 0.95):
 def descriptives(x):
     n = np.size(x)
     miss = np.isnan(x).sum()
-    mean = np.nanmean(x)
-    median = np.nanmedian(x)
-    variance = np.nanvar(A, ddof=1)
+    mean = np.mean(x)
+    median = np.median(x)
+    variance = np.var(x, ddof=1)
     minimum = np.min(x)
     maximum = np.max(x)
 

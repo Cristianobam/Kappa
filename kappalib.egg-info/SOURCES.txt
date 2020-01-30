@@ -12,5 +12,6 @@ kappalib.egg-info/top_level.txt
 kappalib/plot/__init__.py
 kappalib/plot/_plot.py
 kappalib/stats/__init__.py
-kappalib/stats/_stats.py
+kappalib/stats/_inference.py
+kappalib/stats/_statistics.py
 kappalib/stats/_summary.py
