@@ -197,7 +197,7 @@ def descriptives(x):
     miss = np.isnan(x).sum()
     mean = np.nanmean(x)
     median = np.nanmedian(x)
-    variance = np.nanvar(A, ddof=1)
+    variance = np.nanvar(x, ddof=1)
     minimum = np.min(x)
     maximum = np.max(x)
 

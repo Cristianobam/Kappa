@@ -63,15 +63,27 @@ class Correlation():
         self._set_table(confidence_interval)
     
     def CI(self):
+        '''
+        Returns the Confidence Interval
+        '''
         return (self._CI_l, self._CI_u)    
         
     def r(self):
+        '''
+        Returns the Statistics
+        '''
         return self._r
 
     def pvalue(self):
+        '''
+        Returns the P-Value
+        '''
         return self._pvalue
 
     def degrees_fredom(self):
+        '''
+        Returns the Degrees of Freedom
+        '''
         return self._v
 
     def __getattr__(self, attr):
@@ -112,6 +124,9 @@ class Correlation():
                 self._body.append([i,stats_descript]+data)
         
     def summary(self):
+        '''
+        Returns the Summary
+        '''
         print('Correlation Matrix')
         print(tabulate(self._body, self._header, tablefmt="grid", floatfmt=".3f", stralign='center'))
         if self._alternative == 'less':
@@ -120,9 +135,20 @@ class Correlation():
                 print(r'Note. H0: positive correlation')
 
     def matrix(self):
-        heatmap(self._r,vmin=-1,vmax=1,annot=True,cbar=True,xticklabels=self._names,yticklabels=self._names)
+        '''
+        Plots the Correlation Matrix
+        '''
+        heatmap(self._r,vmin=-1,vmax=1,annot=True,cbar=True,xticklabels=self._names,yticklabels=self._names,)
     
     def scatter(self,figsize=(10,10)):
+        '''
+        Plots the Correlation Scatter Plots
+
+        Parameters
+        ----------
+        figsize : tuple
+            The size of the figure to plot
+        '''
         n = len(self._names)
         fig = plt.figure(figsize=figsize)
 
@@ -170,7 +196,7 @@ class Correlation():
         else:
             raise Exception(r'Error. {} not in [latex, html].'.format(format))
 
-class TTest():  
+class TTest():
   __slots__ = ['_x', '_y', '_ttest', '_stats', '_v', '_pvalue','_alpha',
                 '_mean_difference', '_CI_l', '_CI_u', '_CohensD', 
                 '_method','_header','_body','_mu', '_alternative']

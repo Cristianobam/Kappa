@@ -3,7 +3,7 @@ import numpy as np
 
 __all__ = ['pooledVar', 'moving_average']
 
-def moving_average(x,axis=0,type='simple',weight=1):
+def moving_average(x,w,mode='linear'):
     """
     Moving Average for an Array.
 
@@ -13,17 +13,26 @@ def moving_average(x,axis=0,type='simple',weight=1):
     x: Array Vector
         The arrays must have the same shape, except in the dimension.
 
+    w: Int
+        Window size
+
+    mode: {linear, exp}
+        Linear: Simple Moving Average 
+        Exponential: Exponetial Weighted Moving Average
+
     Returns
     -------
-    sp : float
-        The calculated pooled variance.
-    """
-
+    mean : array
+        The calculated moving average.
+    """  
+    if mode == 'linear':
+        weight = np.ones(w)/w
+    elif mode == 'exp':
+        weight = np.exp(-np.linspace(0,w,w))
     x = np.array(x)
-    n = np.shape(x)[axis]
-    weights = np.ones(n)/n 
-    for i in range(n):
-       np.convolve(x[i,:], n, mode='valid') 
+    mean = np.convolve(x,weight, mode='full')[:-w+1]
+    
+    return mean
 
 def pooledVar(x, y):
     """
